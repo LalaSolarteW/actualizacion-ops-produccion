@@ -3,7 +3,7 @@ name: Actualizar OP Impel
 on:
   schedule:
     - cron: '0 11 * * *'  # 6am Colombia = 11am UTC
-  workflow_dispatch:        # botón manual en GitHub
+  workflow_dispatch:
 
 jobs:
   actualizar:
@@ -26,3 +26,11 @@ jobs:
           IMPEL_USER: ${{ secrets.IMPEL_USER }}
           IMPEL_PASS: ${{ secrets.IMPEL_PASS }}
         run: python app.py
+
+      - name: Guardar Excel en GitHub
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add op_det_completo.xlsx
+          git commit -m "actualizar op_det_completo.xlsx - $(date +'%Y-%m-%d %H:%M')" || echo "Sin cambios"
+          git push
