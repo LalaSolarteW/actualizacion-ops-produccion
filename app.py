@@ -17,14 +17,16 @@ df_comerciales = pd.read_csv('comerciales.csv', encoding='utf-8-sig') # Comercia
 # ----------------------------------------- FUNCIONES -----------------------------------------
 
 def obtener_ultima_fecha(ruta_archivo, columna_fecha, fecha_default="2024-01-01"):
-    """Obtener última fecha guardada en el archivo CSV."""
+    """Obtener última fecha guardada en el archivo Excel."""
     if os.path.exists(ruta_archivo):
         df = pd.read_excel(ruta_archivo)
         if not df.empty and columna_fecha in df.columns:
             df[columna_fecha] = pd.to_datetime(df[columna_fecha], errors='coerce')
             ultima = df[columna_fecha].max()
             if pd.notna(ultima):
-                return ultima.strftime("%Y-%m-%d")
+                # Restamos 1 día para asegurar overlap y no perder registros
+                desde = ultima - pd.Timedelta(days=1)
+                return desde.strftime("%Y-%m-%d")
     return fecha_default
 
 
