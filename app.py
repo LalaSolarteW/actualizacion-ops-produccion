@@ -1,3 +1,4 @@
+from matplotlib.pylab import rint
 import requests
 from requests.auth import HTTPBasicAuth
 import pandas as pd
@@ -277,12 +278,14 @@ def main():
         'Estado', 'Comercial', 'Costeo', 'Costeo Producto', 'Fecha Costeo', 'Fecha Costeo Producto',
         'Id Costeo Producto', 'Fecha Op-Det', 'Fecha', 'Id op-det'
     ]]
-
+    df_final['Detalle'] = df_final['Detalle'].str.replace('\n', ' ').str.replace('\r', ' ')
+    
     df_os = df_os [[
         'Num-OP', 'OP Det', 'Cantidad OP-D', 'Detalle',  'Cliente', 'Total Precio',
         'Estado', 'Id_OS', 'Cantidad OS', 'Servicio',
         'Num OS', 'Fecha OS', 'Fecha Op-Det', 'Id op-det'
     ]]
+    df_os['Detalle'] = df_os['Detalle'].str.replace('\n', ' ').str.replace('\r', ' ')
     
     # ===== GUARDAR RESULTADO FINAL =====
     guardar_datos(df_final, archivo_final, clave_dedup=['Id op-det', 'Talla'])
