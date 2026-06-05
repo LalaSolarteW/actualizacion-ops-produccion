@@ -31,6 +31,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add op_det_completo.xlsx
-          git commit -m "actualizar op_det_completo.xlsx - $(date +'%Y-%m-%d %H:%M')" || echo "Sin cambios"
+          git add op_det_completo.xlsx op_det_os.xlsx
+          git commit -m "actualizar excels - $(date +'%Y-%m-%d %H:%M')" || echo "Sin cambios"
           git push
