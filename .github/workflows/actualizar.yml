@@ -1,0 +1,28 @@
+name: Actualizar OP Impel
+
+on:
+  schedule:
+    - cron: '0 11 * * *'  # 6am Colombia = 11am UTC
+  workflow_dispatch:        # botón manual en GitHub
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Instalar dependencias
+        run: pip install requests pandas openpyxl
+
+      - name: Correr script
+        env:
+          IMPEL_USER: ${{ secrets.IMPEL_USER }}
+          IMPEL_PASS: ${{ secrets.IMPEL_PASS }}
+        run: python app.py

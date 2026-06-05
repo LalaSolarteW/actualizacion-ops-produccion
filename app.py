@@ -3,8 +3,9 @@ from requests.auth import HTTPBasicAuth
 import pandas as pd
 import os
 
-USER = "lauras@14145987"
-PASS = "HeyAngel7u7"
+
+USER = os.environ.get("IMPEL_USER")
+PASS = os.environ.get("IMPEL_PASS")
 URL = "https://www.impeltechnology.com/rest/api/selectQuery"
 
 # Cargue de archivos
