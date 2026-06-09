@@ -116,7 +116,7 @@ def main():
     query_opdet = """
     SELECT Num_OP, name, id, Producir, Detalle, ClienteNombre, Estado, Total_Precio, createdAt, R49573112
     FROM productionorder 
-    WHERE Estado IN (14149160, 14149163, 15549065) 
+    WHERE Estado IN (14149160, 14149163, 15549065, 14149164) 
     """
     df_opdet = descargar_datos(query_opdet, "createdAt", fecha_op_det)
     df_opdet.columns = ['Num-OP', 'OP Det', 'Id op-det','Cantidad OP-D', 'Detalle', 'Cliente', 'status_id', 'Total Precio', 'Fecha Op-Det', 'Id Costeo Producto']
