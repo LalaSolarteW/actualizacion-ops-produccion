@@ -17,8 +17,8 @@ df_comerciales = pd.read_csv('comerciales.csv', encoding='utf-8-sig')
 
 # ----------------------------------------- FUNCIONES -----------------------------------------
 
-def descargar_datos(query_base, campo_fecha):
-    """Descargar datos de la API en bloques de 10k filas."""
+def descargar_datos(query_base, campo_fecha, fecha_inicio="2025-01-01"):
+    """Descargar datos de la API en bloques de 10k filas desde fecha_inicio."""
     all_data = []
     start = 0
     limit = 10000
@@ -26,6 +26,7 @@ def descargar_datos(query_base, campo_fecha):
     while True:
         query = f"""
         {query_base}
+        AND {campo_fecha} >= '{fecha_inicio}'
         ORDER BY {campo_fecha} ASC
         """
 
