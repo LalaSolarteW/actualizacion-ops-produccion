@@ -8,6 +8,9 @@ USER = os.environ.get("IMPEL_USER")
 PASS = os.environ.get("IMPEL_PASS")
 URL = "https://www.impeltechnology.com/rest/api/selectQuery"
 
+print("Usuario Impel:", USER)
+print("Contraseña configurada:", bool(PASS))
+
 # Cargue de archivos
 archivo_final = "op_det_completo.xlsx"
 archivo_final_os = "op_det_os.xlsx"
