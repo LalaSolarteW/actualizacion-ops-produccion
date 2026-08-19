@@ -91,13 +91,13 @@ def main():
     # ===== OP DET =====
     print("\n===== OP DET =======")
     query_opdet = """
-    SELECT Num_OP, name, id, Producir, Detalle, ClienteNombre, Estado, Total_Precio, createdAt, R49573112
+    SELECT Num_OP, name, R11196834, id, Producir, Detalle, ClienteNombre, Estado, Total_Precio, createdAt, R49573112
     FROM productionorder 
     WHERE Estado IN (14149160, 14149163, 15549065, 14149164)
     AND 1=1
     """
     df_opdet = descargar_datos(query_opdet, "createdAt")
-    df_opdet.columns = ['Num-OP', 'OP Det', 'Id op-det', 'Cantidad OP-D', 'Detalle', 'Cliente', 'status_id', 'Total Precio', 'Fecha Op-Det', 'Id Costeo Producto']
+    df_opdet.columns = ['Num-OP', 'OP Det', 'Id producto', 'Id op-det', 'Cantidad OP-D', 'Detalle', 'Cliente', 'status_id', 'Total Precio', 'Fecha Op-Det', 'Id Costeo Producto']
     df_opdet = df_opdet.merge(
         df_estados[['status_id', 'Estado']],
         on='status_id',
@@ -127,7 +127,18 @@ def main():
     df_productos = descargar_datos(query_productos, "createdAt")
     df_productos.columns = ['Producto', 'Id producto', 'Fecha_productos']
     print(f"  df_productos: {len(df_productos)} filas")
-
+    
+    # ===== PROVEEDORES =====
+    print("\n===== PROVEEDORES =======")
+    query_proveedores = """
+    SELECT name, id, createdAt
+    FROM Proveedor
+    WHERE 1=1
+    """
+    df_proveedor = descargar_datos(query_proveedores, "createdAt")
+    df_proveedor.columns = ['Proveedor', 'Id proveedor', 'Fecha_proveedor']
+    print(f"  df_proveedores: {len(df_proveedor)} filas")
+    
     # ===== COSTEO PRODUCTO =====
     print("\n===== COSTEO PRODUCTO =======")
     query_costeoprod = """
@@ -166,18 +177,30 @@ def main():
     df_sp = descargar_datos(query_sp, "createdAt")
     df_sp.columns = ['Id_OS', 'Id_Servicio', 'Servicio', 'Fecha SP']
     print(f"  df_sp: {len(df_sp)} filas")
-
+    
+    # =====TALLAS ORDENES DE SATELITE =====
+    print("\n===== OS TALLAS =======")
+    query_os_tallas = """
+    SELECT createdAt, Entregada, R11271995, name 
+    FROM Satelite_Prenda
+    WHERE 1=1
+    """
+    df_os_tallas = descargar_datos(query_os_tallas, "createdAt")
+    df_os_tallas.columns = ['Fecha OS Tallas', 'Cantidad', 'Id_OS', 'Talla']
+    print(f"  df_os_tallas: {len(df_os_tallas)} filas")
+    
     # ===== ORDENES DE SATELITE =====
     print("\n===== OS =======")
     query_os = """
-    SELECT Num_OS, name, Cantidad, id, Fecha_de_Entrega 
+    SELECT Num_OS, name, Cantidad, id, R5365779, Fecha_de_Entrega 
     FROM Orden_de_Satelite 
     WHERE 1=1
     """
     df_os = descargar_datos(query_os, "Fecha_de_Entrega")
-    df_os.columns = ['Num OS', 'OP Det', 'Cantidad OS', 'Id_OS', 'Fecha OS']
+    df_os.columns = ['Num OS', 'OP Det', 'Cantidad OS', 'Id_OS', 'Id proveedor', 'Fecha OS']
     df_os["OP Det"] = df_os["OP Det"].str.replace(r'^[^-]+-[^-]+-', '', regex=True)
     df_os = df_os.merge(df_sp, on='Id_OS', how='left')
+    df_os = df_os.merge(df_proveedor, on='Id proveedor', how='left')
     print(f"  df_os: {len(df_os)} filas")
 
     # ===== MERGES =====
@@ -190,8 +213,22 @@ def main():
         how='left'
     )
     print(f"  df_prendas: {len(df_prendas)} filas")
-
-    # 2. OP Det + Prendas
+    
+    df_prendas_os = df_opdet.merge(
+        df_productos[['Id producto', 'Producto']],
+        on='Id producto',
+        how='left'
+    )
+    print(f"  df_prendas_os: {len(df_prendas_os)} filas")
+    
+    # tabla os + tallas
+    df_osfin = df_os.merge(
+        df_os_tallas,
+        on='Id_OS',
+        how='left'
+    )
+    
+    # OP Det + Prendas
     df_opd = df_opdet.merge(
         df_prendas,
         on='Id op-det',
@@ -199,7 +236,8 @@ def main():
     )
     print(f"  df_opd: {len(df_opd)} filas")
 
-    # 3. Costeo + Costeo Producto
+        
+    # Costeo + Costeo Producto
     df_costeo = df_costeo.merge(
         df_costeoprod,
         on='Id Costeo',
@@ -215,14 +253,19 @@ def main():
         on='Id Costeo Producto',
         how='left'
     )
-
-    # 5. OS + OP Det
-    df_os_final = df_opdet.merge(
-        df_os,
-        on='OP Det',
-        how='left'
-    )
-
+    df_final_os = df_prendas_os.merge(
+            df_costeo,
+            on='Id Costeo Producto',
+            how='left'
+        )
+    
+    df_os_final = df_final_os.merge(
+            df_osfin,
+            on='OP Det',
+            how='left'
+        )
+    
+    
     # ===== SELECCION DE COLUMNAS =====
     df_final = df_final[[
         'Num-OP', 'OP Det', 'Producto', 'Detalle', 'Cliente', 'Cantidad', 'Talla', 'Total Precio',
@@ -231,19 +274,18 @@ def main():
     ]]
 
     df_os_final = df_os_final[[
-        'Num-OP', 'OP Det', 'Cantidad OP-D', 'Detalle', 'Cliente', 'Total Precio',
-        'Estado', 'Id_OS', 'Cantidad OS', 'Servicio',
-        'Num OS', 'Fecha OS', 'Fecha Op-Det', 'Id op-det'
+            'Num-OP', 'OP Det', 'Cantidad OP-D', 'Detalle', 'Cliente', 'Total Precio', 'Costeo', 'Costeo Producto',
+            'Comercial', 'Estado', 'Cantidad OS', 'Servicio', 'Num OS', 'Proveedor', 'Talla', 'Cantidad', 'Fecha Costeo', 'Fecha Op-Det'
     ]]
-
+    
     # ===== LIMPIEZA DE TEXTO =====
     df_final['Detalle'] = limpiar_texto(df_final['Detalle'])
     df_os_final['Detalle'] = limpiar_texto(df_os_final['Detalle'])
-
+    
     # ===== GUARDAR =====
     guardar_datos(df_final, archivo_final)
     print("\n✅ Proceso completado")
-
+    
     guardar_datos(df_os_final, archivo_final_os)
     print("\n✅ Proceso OS completado")
 
