@@ -20,7 +20,7 @@ df_comerciales = pd.read_csv('comerciales.csv', encoding='utf-8-sig')
 
 # ----------------------------------------- FUNCIONES -----------------------------------------
 
-def descargar_datos(query_base, campo_fecha, fecha_inicio="2025-01-01"):
+def descargar_datos(query_base, campo_fecha, fecha_inicio="2020-01-01"):
     """Descargar datos de la API en bloques de 10k filas desde fecha_inicio."""
     all_data = []
     start = 0
@@ -96,7 +96,7 @@ def main():
     WHERE Estado IN (14149160, 14149163, 15549065, 14149164)
     AND 1=1
     """
-    df_opdet = descargar_datos(query_opdet, "createdAt")
+    df_opdet = descargar_datos(query_opdet, "createdAt", "2026-01-01")
     df_opdet.columns = ['Num-OP', 'OP Det', 'Id producto', 'Id op-det', 'Cantidad OP-D', 'Detalle', 'Cliente', 'status_id', 'Total Precio', 'Fecha Op-Det', 'Id Costeo Producto']
     df_opdet = df_opdet.merge(
         df_estados[['status_id', 'Estado']],
@@ -113,7 +113,7 @@ def main():
     FROM Produccion_Prenda
     WHERE 1=1
     """
-    df_tallas = descargar_datos(query_tallas, "createdAt")
+    df_tallas = descargar_datos(query_tallas, "createdAt", "2026-01-01")
     df_tallas.columns = ['Id op-det', 'Id producto', 'Talla', 'Cantidad', 'Fecha']
     print(f"  df_tallas: {len(df_tallas)} filas")
 
@@ -146,7 +146,7 @@ def main():
     FROM Costeo_Producto
     WHERE 1=1
     """
-    df_costeoprod = descargar_datos(query_costeoprod, "CREATED_AT")
+    df_costeoprod = descargar_datos(query_costeoprod, "CREATED_AT", "2025-01-01")
     df_costeoprod.columns = ['Costeo Producto', 'Id Costeo Producto', 'Id Costeo', 'Fecha Costeo Producto']
     print(f"  df_costeoprod: {len(df_costeoprod)} filas")
 
@@ -157,7 +157,7 @@ def main():
     FROM Costeo
     WHERE 1=1
     """
-    df_costeo = descargar_datos(query_costeo, "CREATED_AT")
+    df_costeo = descargar_datos(query_costeo, "CREATED_AT", "2025-01-01")
     df_costeo.columns = ['Costeo', 'Id Costeo', 'id_comercial', 'Fecha Costeo']
     df_costeo = df_costeo.merge(
         df_comerciales,
@@ -185,7 +185,7 @@ def main():
     FROM Satelite_Prenda
     WHERE 1=1
     """
-    df_os_tallas = descargar_datos(query_os_tallas, "createdAt")
+    df_os_tallas = descargar_datos(query_os_tallas, "createdAt", "2026-01-01")
     df_os_tallas.columns = ['Fecha OS Tallas', 'Cantidad', 'Id_OS', 'Talla']
     print(f"  df_os_tallas: {len(df_os_tallas)} filas")
     
@@ -196,7 +196,7 @@ def main():
     FROM Orden_de_Satelite 
     WHERE 1=1
     """
-    df_os = descargar_datos(query_os, "Fecha_de_Entrega")
+    df_os = descargar_datos(query_os, "Fecha_de_Entrega", "2026-01-01")
     df_os.columns = ['Num OS', 'OP Det', 'Cantidad OS', 'Id_OS', 'Id proveedor', 'Fecha OS']
     df_os["OP Det"] = df_os["OP Det"].str.replace(r'^[^-]+-[^-]+-', '', regex=True)
     df_os = df_os.merge(df_sp, on='Id_OS', how='left')
