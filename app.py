@@ -93,7 +93,7 @@ def main():
     query_opdet = """
     SELECT Num_OP, name, R11196834, id, Producir, Detalle, ClienteNombre, Estado, Total_Precio, createdAt, R49573112
     FROM productionorder 
-    WHERE Estado IN (14149160, 14149163, 15549065, 14149164)
+    WHERE Estado IN (14149160, 14149163, 15549065, 14149164, 14149165)
     AND 1=1
     """
     df_opdet = descargar_datos(query_opdet, "createdAt", "2026-01-01")
